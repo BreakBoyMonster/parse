@@ -17,18 +17,14 @@ jobs = []
 urls = []
 pattern = r'\s{2,}|\xa0|\u2060'
 
+# req = session.get(base_url + "?page=" + str(150))
+# print(req.status_code)
+
 
 def get_company(base_url, cnt):
 
     urls.append(base_url + '?page=' + str(cnt))
     req = session.get(urls[-1], headers=headers)
-    # if req.status_code == 200:
-        # bsObj = BS(req.content, 'html.parser')
-        # pagination = bsObj.find('ul', attrs={'class': 'pagination'})
-        # if pagination:
-        #     pages = pagination.find_all('li', attrs={'class': False})
-        #     for page in pages:
-        #         urls.append(domain + page.a['href'])
 
     if req.status_code == 200:
         bsObj = BS(req.content, 'html.parser')
@@ -39,27 +35,31 @@ def get_company(base_url, cnt):
             short = div.p.text
             short = re.sub(pattern, ' ', short)
             short = short.strip()
+            span_list = div.find_all('span')
             company = 'No name'
-            logo = div.find('img')
-            if logo:
-                company = logo['alt']
-            jobs.append({'cnt': cnt,
-                         'title': title,
+            for span in span_list:
+                b = span.find('b')
+                if b:
+                    company = b.text
+                    break
+            jobs.append({'title': title,
                          'href': domain + href,
                          'description': short,
                          'company': company})
 
-        # print(cnt)
         return True
-    return False
+    return
+
 
 cnt = 1
-while get_company(base_url, cnt):
+while cnt < 16:
+    if not get_company(base_url, cnt):
+        break
     cnt += 1
 
 handle = open('jobs.html', 'w', encoding='utf-8')
 handle.write(str(jobs))
 handle.close()
 
-for i in jobs:
-    print(i)
+# for i in jobs:
+#     print(i)
