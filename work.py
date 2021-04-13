@@ -47,14 +47,17 @@ def get_company(base_url, cnt):
                          'description': short,
                          'company': company})
 
-        return True
+        if div_list:
+            return True
     return
 
 
 cnt = 1
-while cnt < 16:
-    if not get_company(base_url, cnt):
-        break
+# while cnt < 16:
+#     if not get_company(base_url, cnt):
+#         break
+#     cnt += 1
+while get_company(base_url, cnt):
     cnt += 1
 
 handle = open('jobs.html', 'w', encoding='utf-8')
